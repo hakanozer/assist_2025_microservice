@@ -1,9 +1,21 @@
 using Microsoft.EntityFrameworkCore;
-using Product.Infrastructure.Persistece;
+using Product.API.Services;
+using Product.Application.Mapping;
+using Product.API.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddConsulServiceDiscovery(builder.Configuration);
+
+
+builder.Services.AddControllers();
 //builder.Services.AddOpenApi();
+
+// AutoMapper
+builder.Services.AddAutoMapper(typeof(AppProfile));
+
+// Service add di
+builder.Services.AddScoped<ProductService>();
 
 // DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(option =>
@@ -14,6 +26,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
 
 var app = builder.Build();
 
+app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
 // Swagger UI Active
 /*
 if (app.Environment.IsDevelopment())
@@ -27,6 +40,6 @@ if (app.Environment.IsDevelopment())
     });
 }
 */
-
-app.UseHttpsRedirection();
+app.MapControllers();
+//app.UseHttpsRedirection();
 app.Run();
