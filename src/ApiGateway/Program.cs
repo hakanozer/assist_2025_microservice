@@ -23,21 +23,24 @@ builder.Services.AddRateLimiter(options =>
 {
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
     {
-        return RateLimitPartition.GetFixedWindowLimiter("Global", _ => new FixedWindowRateLimiterOptions
-        {
-            PermitLimit = 1, // max 1 istek
-            Window = TimeSpan.FromMinutes(1), // 1 dakika penceresi
-            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-            QueueLimit = 0 // Kuyruk yok
-        });
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.User.Identity?.Name ?? "unknown",
+            factory: partition => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 1, // max 1 istek
+                Window = TimeSpan.FromSeconds(1), // her saniye
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0, // kuyruk yok,
+             
+            });
     });
-
-    options.OnRejected = async (context, cancellationToken) =>
-    {
-        context.HttpContext.Response.StatusCode = 429; // Too Many Requests
-        context.HttpContext.Response.Headers.RetryAfter = "60"; // 60 saniye sonra tekrar dene
-        await context.HttpContext.Response.WriteAsync("Too many requests. Please try again later.", cancellationToken);
-    };
+        options.OnRejected = async (context, cancellationToken) =>
+        {
+            context.HttpContext.Response.StatusCode = 429; // Too Many Requests
+            context.HttpContext.Response.Headers.RetryAfter = "60"; // 60 saniye sonra tekrar dene
+            await context.HttpContext.Response.WriteAsync("Too many requests. Please try again later. : " + context.HttpContext.User.Identity?.Name, cancellationToken);
+        };
+    // options.RejectionStatusCode = 429;
 });
 
 // --------------------------------------
@@ -129,11 +132,28 @@ app.MapGet("/health", async (IConsulClient consul) =>
     }
 });
 
+
+
 app.UseCors("AllowAll");
 app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.Use(async (context, next) =>
+{
+    // header jwt içinde user bilgisi var mı?
+    //var jwt = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+    // jwt içinde name mi getir
+    //var name = jwt.Split('.')[1];
+    // base64 decode et
+    //var nameBytes = Convert.FromBase64String(name);
+    //var nameString = Encoding.UTF8.GetString(nameBytes);
+    // user bilgisi var ise context'e ekle
+    //if (nameString.Contains("name"))
+    //Console.WriteLine($"Request from user: {nameString}");
+    await next();
+});
 
 // 🔐 Custom Authorization Middleware - Role
 // app.UseMiddleware<RouteAuthorizationMiddleware>();

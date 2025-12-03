@@ -8,3 +8,11 @@ services:
     command: agent -server -ui -bootstrap-expect=1 -client=0.0.0.0
     environment:
       - CONSUL_BIND_INTERFACE=eth0
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest    
