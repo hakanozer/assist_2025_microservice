@@ -6,8 +6,17 @@ using RestApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddConsulServiceDiscovery(builder.Configuration);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
+builder.Services.AddConsulServiceDiscovery(builder.Configuration);
 
 // Swagger + JWT desteği
 builder.Services.AddSwaggerWithJwt();
@@ -34,6 +43,7 @@ builder.Services.AddAutoMapper(typeof(AppProfile));
 builder.Services.AddControllers();
 
 var app = builder.Build();
+app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
 
 // Swagger UI Active
 if (app.Environment.IsDevelopment())
@@ -53,5 +63,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<GlobalExceptionHandler>();
 
-app.MapControllers();
+app.UseCors("AllowAll");
 app.Run();

@@ -3,6 +3,7 @@ using Product.API.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Product.Application.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Product.API.Controllers
 {
@@ -20,6 +21,7 @@ namespace Product.API.Controllers
         [HttpGet("all")]
         public async Task<ActionResult<List<Domain.Entities.ProductEntity>>> GetAllProducts()
         {
+            Console.WriteLine("Fetching all products - 1");
             var products = await _productService.GetAllProductsAsync();
             return Ok(products);
         }

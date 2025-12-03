@@ -49,7 +49,7 @@ public static class ConsulExtensions
                 HTTP = url,
                 Interval = TimeSpan.FromSeconds(10),
                 Timeout = TimeSpan.FromSeconds(5),
-                //DeregisterCriticalServiceAfter = TimeSpan.FromMinutes(1)
+                DeregisterCriticalServiceAfter = TimeSpan.FromMinutes(1)
                 
             }
         };

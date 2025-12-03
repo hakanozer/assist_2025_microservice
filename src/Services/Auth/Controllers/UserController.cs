@@ -30,9 +30,9 @@ namespace RestApi.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserLoginDto userLoginDto)
         {
-            var kvPair = await _consulClient.KV.Get("jwtKey");
-            var obj = kvPair.Response.Value;
-            Console.WriteLine(System.Text.Encoding.UTF8.GetString(obj));
+            //var kvPair = await _consulClient.KV.Get("jwtKey");
+            //var obj = kvPair.Response.Value;
+            //Console.WriteLine(System.Text.Encoding.UTF8.GetString(obj));
 
             var userJwtDto = _userService.Login(userLoginDto);
             if (userJwtDto == null)

@@ -4,6 +4,15 @@ using Product.Application.Mapping;
 using Product.API.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
 builder.Services.AddConsulServiceDiscovery(builder.Configuration);
 
@@ -25,6 +34,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
 });
 
 var app = builder.Build();
+
+app.UseCors("AllowAll");
 
 app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
 

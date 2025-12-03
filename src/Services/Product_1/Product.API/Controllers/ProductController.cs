@@ -20,6 +20,7 @@ namespace Product.API.Controllers
         [HttpGet("all")]
         public async Task<ActionResult<List<Domain.Entities.ProductEntity>>> GetAllProducts()
         {
+            Console.WriteLine("Fetching all products - 2");
             var products = await _productService.GetAllProductsAsync();
             return Ok(products);
         }

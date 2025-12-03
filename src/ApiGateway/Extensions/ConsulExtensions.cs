@@ -43,13 +43,13 @@ public static class ConsulExtensions
             ID = serviceId,
             Name = serviceName,
             Address = _configuration["Consul:ServiceAddress"],
-            Port = int.Parse(_configuration["Consul:ServicePort"]),
+            Port = int.Parse(_configuration["Consul:ServicePort"].ToString()),
             Check = new AgentServiceCheck
             {
                 HTTP = url,
                 Interval = TimeSpan.FromSeconds(10),
                 Timeout = TimeSpan.FromSeconds(5),
-                DeregisterCriticalServiceAfter = TimeSpan.FromMinutes(1)
+                //DeregisterCriticalServiceAfter = TimeSpan.FromMinutes(1)
             }
         };
 
