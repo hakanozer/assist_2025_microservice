@@ -64,4 +64,7 @@ app.UseAuthorization();
 app.UseMiddleware<GlobalExceptionHandler>();
 
 app.UseCors("AllowAll");
+
+app.MapControllers();
+
 app.Run();

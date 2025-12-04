@@ -2,9 +2,10 @@ using RabbitMQ.Client;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 
+
 public interface IRabbitMQProducer
 {
-    Task SendMessageAsync(string message);
+    Task SendMessageAsync(string message, string queueName);
 }
 
 public class RabbitMQProducer : IRabbitMQProducer
@@ -16,7 +17,7 @@ public class RabbitMQProducer : IRabbitMQProducer
         _configuration = configuration;
     }
 
-    public async Task SendMessageAsync(string message)
+    public async Task SendMessageAsync(string message, string queueName)
     {
         var factory = new ConnectionFactory
         {
@@ -32,7 +33,7 @@ public class RabbitMQProducer : IRabbitMQProducer
 
         // Queue declare
         await channel.QueueDeclareAsync(
-            queue: "order-queue",
+            queue: queueName,
             durable: false,
             exclusive: false,
             autoDelete: false,
@@ -40,7 +41,7 @@ public class RabbitMQProducer : IRabbitMQProducer
         );
 
         var body = Encoding.UTF8.GetBytes(message);
-        await channel.BasicPublishAsync(exchange: string.Empty, routingKey: "order-queue", body: body);
+        await channel.BasicPublishAsync(exchange: string.Empty, routingKey: queueName, body: body);
 
     }
 }

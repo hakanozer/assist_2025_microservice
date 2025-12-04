@@ -1,9 +1,13 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Order.API.Saga;
+using Order.API.utils;
 
 var builder = WebApplication.CreateBuilder(args);
+//builder.Services.AddHostedService<OutboxWorker>();
 
 Console.WriteLine("Key: " + builder.Configuration["Jwt:Key"]);
 
@@ -19,9 +23,17 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddConsulServiceDiscovery(builder.Configuration);
 builder.Services.AddHostedService<RabbitMQConsumer>();
+//builder.Services.AddHostedService<CompensationConsumer>();
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+// DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(option =>
+{
+    var path = builder.Configuration.GetConnectionString("DefaultConnection");
+    option.UseSqlite(path);
+});
 
 // JWT Authentication
 builder.Services.AddJwtAuthentication(builder.Configuration);

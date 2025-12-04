@@ -61,9 +61,11 @@ public class ConsulProxyConfigProvider : IProxyConfigProvider
                     foreach (var svc in group)
                     {
                         // 🔧 host.docker.internal -> localhost dönüştür
+                        // address docker içinden erişilebilir olmalı
                         var address = svc.Address == "host.docker.internal" 
-                            ? "127.0.0.1" 
-                            : svc.Address;
+                        ? svc.Address  // localhost DEĞİL, host.docker.internal bırakın
+                        : svc.Address;
+                        
                         
                         var destinationAddress = $"http://{address}:{svc.Port}";
                         

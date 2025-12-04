@@ -29,7 +29,7 @@ public class RabbitMQConsumer : BackgroundService
         _channel = await _connection.CreateChannelAsync();
 
         await _channel.QueueDeclareAsync(
-            queue: "order-fail-queue",
+            queue: "order-queue",
             durable: false,
             exclusive: false,
             autoDelete: false,
@@ -42,12 +42,13 @@ public class RabbitMQConsumer : BackgroundService
         {
             var body = ea.Body.ToArray();
             var message = Encoding.UTF8.GetString(body);
-
-            _logger.LogInformation($"Hata Mesaj alındı: {message}");
+            RabbitMQProducer producer = new RabbitMQProducer(new ConfigurationBuilder().AddJsonFile("appsettings.json").Build());
+            await producer.SendMessageAsync(message, "order-fail-queue");
+            _logger.LogInformation($"Mesaj alındı: {message}");
         };
 
         await _channel.BasicConsumeAsync(
-            queue: "order-fail-queue",
+            queue: "order-queue",
             autoAck: true,
             consumer: consumer
         );

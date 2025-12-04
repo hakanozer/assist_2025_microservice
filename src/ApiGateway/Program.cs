@@ -14,11 +14,12 @@ var builder = WebApplication.CreateBuilder(args);
 // 👇 Consul JSON Configuration
 builder.Configuration.AddConsulJson(
     consulKey: "config/jwt-settings",
-    consulAddress: "http://localhost:8500"
+    consulAddress: "http://consul:8500"
 );
 
 // Rate Limiting
 // status code 429 olsun, kullanıcıya bildir ve kullanıcıya ne kadar beklemesi gerektiğini söyle
+/*
 builder.Services.AddRateLimiter(options =>
 {
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
@@ -42,6 +43,7 @@ builder.Services.AddRateLimiter(options =>
         };
     // options.RejectionStatusCode = 429;
 });
+*/
 
 // --------------------------------------
 // Consul Service Discovery (senin extension)
@@ -60,7 +62,7 @@ builder.Services.AddSingleton<IProxyConfigProvider, ConsulProxyConfigProvider>()
 // Consul Client
 // --------------------------------------
 builder.Services.AddSingleton<IConsulClient, ConsulClient>(p =>
-    new ConsulClient(cfg => cfg.Address = new Uri("http://localhost:8500")));
+    new ConsulClient(cfg => cfg.Address = new Uri("http://consul:8500")));
 
 // --------------------------------------
 // JWT Authentication
@@ -135,7 +137,7 @@ app.MapGet("/health", async (IConsulClient consul) =>
 
 
 app.UseCors("AllowAll");
-app.UseRateLimiter();
+//app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();

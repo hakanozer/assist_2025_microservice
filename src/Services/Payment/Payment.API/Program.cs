@@ -10,6 +10,8 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddConsulServiceDiscovery(builder.Configuration);
 
+builder.Services.AddHostedService<RabbitMQConsumer>();
+
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

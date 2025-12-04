@@ -4,10 +4,11 @@ services:
     container_name: consul
     ports:
       - "8500:8500"
-      - "8600:8600/udp"
+      - "8500:8500/udp"
     command: agent -server -ui -bootstrap-expect=1 -client=0.0.0.0
     environment:
       - CONSUL_BIND_INTERFACE=eth0
+
   rabbitmq:
     image: rabbitmq:3-management
     ports:
@@ -15,4 +16,14 @@ services:
       - "5672:5672"
     environment:
       RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest    
+      RABBITMQ_DEFAULT_PASS: guest
+
+  api-gateway:
+    build: ./src/ApiGateway
+    container_name: api-gateway
+    environment:
+      - ASPNETCORE_URLS=http://+:8090
+      - Consul__Host=consul
+      - Consul__Port=8500
+    ports:
+      - "8090:8090"
